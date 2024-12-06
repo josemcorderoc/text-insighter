@@ -6,15 +6,25 @@ from collections import Counter
 import pandas as pd
 import altair as alt
 
-# Load the spaCy model
-nlp = spacy.load("en_core_web_md")
-
 # Define Streamlit layout
 st.set_page_config(layout="wide", page_title="Text Insighter")
 st.title("Text Insighter")
 st.sidebar.header("Settings")
 
 # Sidebar settings
+spacy_models = {
+    "en_core_web_md": "🇺🇸 English",
+    "es_core_news_md": "🇪🇸 Spanish"
+}
+model_option = st.sidebar.selectbox(
+    "Select spaCy model:",
+    options=list(spacy_models.keys()),
+    format_func=spacy_models.get
+)
+
+# Load the selected spaCy model
+nlp = spacy.load(model_option)
+
 top_n = st.sidebar.slider("Top N elements to display", min_value=1, max_value=30, value=15)
 
 # Full POS list with descriptions
