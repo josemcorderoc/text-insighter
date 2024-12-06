@@ -6,29 +6,26 @@ from collections import Counter
 import pandas as pd
 import altair as alt
 import json
+import gettext
 
 # Define Streamlit layout
-st.set_page_config(layout="wide", page_title="Text Insighter")
-st.title("Text Insighter")
-st.sidebar.header("Settings")
+st.set_page_config(
+    layout="wide", 
+    page_title="Text Insighter", 
+    page_icon="assets/favicon.ico"
+)
 
-# Sidebar settings
+# Set up localization
+langs = {
+    "en": "🇺🇸",
+    "es": "🇪🇸"
+}
+
 spacy_models = {
     "en": {"model": "en_core_web_md", "label": "🇺🇸 English"},
     "es": {"model": "es_core_news_md", "label": "🇪🇸 Spanish"}
 }
-model_option = st.sidebar.selectbox(
-    "Select spaCy model:",
-    options=list(spacy_models.keys()),
-    format_func=lambda lang: spacy_models[lang]["label"]
-)
 
-# Load the selected spaCy model
-nlp = spacy.load(spacy_models[model_option]["model"])
-
-top_n = st.sidebar.slider("Top N elements to display", min_value=1, max_value=30, value=15)
-
-# Full POS list with descriptions
 pos_options = {
     "ADJ": "Adjective",
     "ADP": "Adposition",
@@ -49,21 +46,51 @@ pos_options = {
     "X": "Other"
 }
 
-# POS inclusion filter
-pos_filter = st.sidebar.multiselect(
-    "Include POS (Part of Speech):",
-    options=list(pos_options.keys()),
-    format_func=pos_options.get,
-    default=[]
+lang = st.sidebar.radio(
+    "",
+    list(langs.keys()),
+    format_func=langs.get,
+    horizontal=True
+)
+locale_dir = "/Users/jm/Code/text-insighter/locales"
+gettext.bindtextdomain('messages', locale_dir)
+gettext.textdomain('messages')
+_ = gettext.translation('messages', locale_dir, languages=[lang]).gettext
+
+st.title("Text Insighter")
+st.sidebar.header(_("Settings"))
+
+# Sidebar settings
+
+model_option = st.sidebar.selectbox(
+    _("Select spaCy model:"),
+    options=list(spacy_models.keys()),
+    format_func=lambda lang: _(spacy_models[lang]["label"])
 )
 
-# POS exclusion filter
-exclude_pos_filter = st.sidebar.multiselect(
-    "Exclude POS (Part of Speech):",
-    options=list(pos_options.keys()),
-    format_func=pos_options.get,
-    default=[]
-)
+# Load the selected spaCy model
+nlp = spacy.load(spacy_models[model_option]["model"])
+
+top_n = st.sidebar.slider(_("Top N elements to display"), min_value=1, max_value=30, value=15)
+
+# Full POS list with descriptions
+# POS inclusion and exclusion filters in a collapsible section
+with st.sidebar.expander(_("Part of Speech (POS)")):
+    # POS inclusion filter
+    pos_filter = st.multiselect(
+        _("Include POS:"),
+        options=list(pos_options.keys()),
+        format_func=lambda pos: _(pos_options[pos]),
+        default=[]
+    )
+
+    # POS exclusion filter
+    exclude_pos_filter = st.multiselect(
+        _("Exclude POS:"),
+        options=list(pos_options.keys()),
+        format_func=lambda pos: _(pos_options[pos]),
+        default=[]
+    )
 
 # Load default values from JSON file
 defaults_file = f"defaults.{model_option}.json"
@@ -71,11 +98,11 @@ try:
     with open(defaults_file, "r") as f:
         defaults = json.load(f)
 except FileNotFoundError:
-    st.error(f"Defaults file for {spacy_models[model_option]['label']} not found. Using empty defaults.")
+    st.error(_("Defaults file for {label} not found. Using empty defaults.").format(label=spacy_models[model_option]['label']))
     defaults = {}
 
 # Exclude unigrams input
-with st.sidebar.expander("Exclude Unigrams"):
+with st.sidebar.expander(_("Exclude Unigrams")):
     exclude_unigrams = st.data_editor(
         pd.DataFrame(defaults.get("exclude_unigrams", []), columns=["Unigram"]),
         num_rows="dynamic",
@@ -84,7 +111,7 @@ with st.sidebar.expander("Exclude Unigrams"):
 exclude_unigrams_set = set(exclude_unigrams["Unigram"].str.lower())
 
 # Exclude bigrams input
-with st.sidebar.expander("Exclude Bigrams"):
+with st.sidebar.expander(_("Exclude Bigrams")):
     exclude_bigrams = st.data_editor(
         pd.DataFrame(defaults.get("exclude_bigrams", []), columns=["Bigram"]),
         num_rows="dynamic",
@@ -93,7 +120,7 @@ with st.sidebar.expander("Exclude Bigrams"):
 exclude_bigrams_set = set(exclude_bigrams["Bigram"].str.lower())
 
 # Unigram replacements
-with st.sidebar.expander("Unigram Replacements"):
+with st.sidebar.expander(_("Unigram Replacements")):
     unigram_replacements = st.data_editor(
         pd.DataFrame(columns=["Word", "Replacement"]),
         num_rows="dynamic",
@@ -101,28 +128,29 @@ with st.sidebar.expander("Unigram Replacements"):
     )
 
 # Bigram replacements
-with st.sidebar.expander("Bigram Replacements"):
+with st.sidebar.expander(_("Bigram Replacements")):
     bigram_replacements = st.data_editor(
         pd.DataFrame(list(defaults.get("replace_bigrams", {}).items()), columns=["Bigram", "Replacement"]),
         num_rows="dynamic",
         key="bigram_replacements"
     )
 
-# Token property checkboxes
-filter_stop_words = st.sidebar.checkbox("Exclude stop words", value=True)
-filter_punct = st.sidebar.checkbox("Exclude punctuation", value=True)
-filter_digits = st.sidebar.checkbox("Exclude digits", value=True)
-filter_currency = st.sidebar.checkbox("Exclude currency symbols", value=True)
-filter_quotes = st.sidebar.checkbox("Exclude quotes", value=True)
-lemmatize = st.sidebar.checkbox("Lemmatize", value=False)
+# Token property checkboxes in a collapsible section
+with st.sidebar.expander(_("Token Filters")):
+    filter_stop_words = st.checkbox(_("Exclude stop words"), value=True)
+    filter_punct = st.checkbox(_("Exclude punctuation"), value=True)
+    filter_digits = st.checkbox(_("Exclude digits"), value=True)
+    filter_currency = st.checkbox(_("Exclude currency symbols"), value=True)
+    filter_quotes = st.checkbox(_("Exclude quotes"), value=True)
+    lemmatize = st.checkbox(_("Lemmatize"), value=False)
 
 # Responsive layout
 col1, col2 = st.columns([2, 1])  # Left (text input + WordCloud) and right (bar charts)
 
 # Actual text input
 with col1:
-    st.subheader("Input Text")
-    text_input = st.text_area("Enter text:", height=300)
+    st.subheader(_("Input Text"))
+    text_input = st.text_area(_("Enter text:"), height=300)
 
 if text_input.strip():
     doc = nlp(text_input)
@@ -185,11 +213,9 @@ if text_input.strip():
         contour_color="black"  # Contour color
     ).generate_from_frequencies(combined_counts)
 
-    
-
     # WordCloud below the text input
     with col1:
-        st.subheader("Word Cloud")
+        st.subheader(_("Word Cloud"))
         fig, ax = plt.subplots(figsize=(12, 6))
         ax.imshow(wordcloud, interpolation="bilinear")
         ax.axis("off")
@@ -212,18 +238,18 @@ if text_input.strip():
 
     # Both bar charts on the right
     with col2:
-        st.subheader("Unigram Frequency Plot")
+        st.subheader(_("Unigram Frequency Plot"))
         top_unigrams = filtered_unigram_counts.most_common(top_n)
         unigram_df = pd.DataFrame(top_unigrams, columns=["Unigram", "Frequency"])
         unigram_chart = create_bar_chart(
-            unigram_df, x_label="Unigram", y_label="Frequency", title="Top Unigrams"
+            unigram_df, x_label="Unigram", y_label="Frequency", title=_("Top Unigrams")
         ).configure_axisX(labelAngle=-45, labelOverlap=False)
         st.altair_chart(unigram_chart, use_container_width=True)
 
-        st.subheader("Bigram Frequency Plot")
+        st.subheader(_("Bigram Frequency Plot"))
         top_bigrams = filtered_bigram_counts.most_common(top_n)
         bigram_df = pd.DataFrame(top_bigrams, columns=["Bigram", "Frequency"])
         bigram_chart = create_bar_chart(
-            bigram_df, x_label="Bigram", y_label="Frequency", title="Top Bigrams"
+            bigram_df, x_label="Bigram", y_label="Frequency", title=_("Top Bigrams")
         ).configure_axisX(labelAngle=-45, labelOverlap=False)
         st.altair_chart(bigram_chart, use_container_width=True)

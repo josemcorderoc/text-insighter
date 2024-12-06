@@ -1,0 +1,136 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "Text Insighter"
+msgstr "Text Insighter"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Select spaCy model:"
+msgstr "Select spaCy model:"
+
+msgid "Top N elements to display"
+msgstr "Top N elements to display"
+
+msgid "Include POS:"
+msgstr "Include POS:"
+
+msgid "Exclude POS:"
+msgstr "Exclude POS:"
+
+msgid "Exclude Unigrams"
+msgstr "Exclude Unigrams"
+
+msgid "Exclude Bigrams"
+msgstr "Exclude Bigrams"
+
+msgid "Unigram Replacements"
+msgstr "Unigram Replacements"
+
+msgid "Bigram Replacements"
+msgstr "Bigram Replacements"
+
+msgid "Exclude stop words"
+msgstr "Exclude stop words"
+
+msgid "Exclude punctuation"
+msgstr "Exclude punctuation"
+
+msgid "Exclude digits"
+msgstr "Exclude digits"
+
+msgid "Exclude currency symbols"
+msgstr "Exclude currency symbols"
+
+msgid "Exclude quotes"
+msgstr "Exclude quotes"
+
+msgid "Lemmatize"
+msgstr "Lemmatize"
+
+msgid "Input Text"
+msgstr "Input Text"
+
+msgid "Enter text:"
+msgstr "Enter text:"
+
+msgid "Word Cloud"
+msgstr "Word Cloud"
+
+msgid "Unigram Frequency Plot"
+msgstr "Unigram Frequency Plot"
+
+msgid "Bigram Frequency Plot"
+msgstr "Bigram Frequency Plot"
+
+msgid "Top Unigrams"
+msgstr "Top Unigrams"
+
+msgid "Top Bigrams"
+msgstr "Top Bigrams"
+
+msgid "🇺🇸 English"
+msgstr "🇺🇸 English"
+
+msgid "🇪🇸 Spanish"
+msgstr "🇪🇸 Spanish"
+
+msgid "Adjective"
+msgstr "Adjective"
+
+msgid "Adposition"
+msgstr "Adposition"
+
+msgid "Adverb"
+msgstr "Adverb"
+
+msgid "Auxiliary"
+msgstr "Auxiliary"
+
+msgid "Coordinating Conjunction"
+msgstr "Coordinating Conjunction"
+
+msgid "Determiner"
+msgstr "Determiner"
+
+msgid "Interjection"
+msgstr "Interjection"
+
+msgid "Noun"
+msgstr "Noun"
+
+msgid "Numeral"
+msgstr "Numeral"
+
+msgid "Particle"
+msgstr "Particle"
+
+msgid "Pronoun"
+msgstr "Pronoun"
+
+msgid "Proper Noun"
+msgstr "Proper Noun"
+
+msgid "Punctuation"
+msgstr "Punctuation"
+
+msgid "Subordinating Conjunction"
+msgstr "Subordinating Conjunction"
+
+msgid "Symbol"
+msgstr "Symbol"
+
+msgid "Verb"
+msgstr "Verb"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Part of Speech (POS)"
+msgstr "Part of Speech (POS)"
+
+msgid "Token Filters"
+msgstr "Token Filters"

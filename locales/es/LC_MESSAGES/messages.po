@@ -1,0 +1,136 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+
+msgid "Text Insighter"
+msgstr "Analizador de Texto"
+
+msgid "Settings"
+msgstr "Configuraciones"
+
+msgid "Select spaCy model:"
+msgstr "Seleccionar modelo spaCy:"
+
+msgid "Top N elements to display"
+msgstr "Mostrar los N elementos principales"
+
+msgid "Include POS:"
+msgstr "Incluir POS:"
+
+msgid "Exclude POS:"
+msgstr "Excluir POS:"
+
+msgid "Exclude Unigrams"
+msgstr "Excluir Unigramas"
+
+msgid "Exclude Bigrams"
+msgstr "Excluir Bigramas"
+
+msgid "Unigram Replacements"
+msgstr "Reemplazos de Unigramas"
+
+msgid "Bigram Replacements"
+msgstr "Reemplazos de Bigramas"
+
+msgid "Exclude stop words"
+msgstr "Excluir stop words"
+
+msgid "Exclude punctuation"
+msgstr "Excluir puntuación"
+
+msgid "Exclude digits"
+msgstr "Excluir dígitos"
+
+msgid "Exclude currency symbols"
+msgstr "Excluir símbolos de moneda"
+
+msgid "Exclude quotes"
+msgstr "Excluir comillas"
+
+msgid "Lemmatize"
+msgstr "Lematizar"
+
+msgid "Input Text"
+msgstr "Texto de Entrada"
+
+msgid "Enter text:"
+msgstr "Ingrese texto:"
+
+msgid "Word Cloud"
+msgstr "Nube de Palabras"
+
+msgid "Unigram Frequency Plot"
+msgstr "Gráfico de Frecuencia de Unigramas"
+
+msgid "Bigram Frequency Plot"
+msgstr "Gráfico de Frecuencia de Bigramas"
+
+msgid "Top Unigrams"
+msgstr "Principales Unigramas"
+
+msgid "Top Bigrams"
+msgstr "Principales Bigramas"
+
+msgid "🇺🇸 English"
+msgstr "🇺🇸 Inglés"
+
+msgid "🇪🇸 Spanish"
+msgstr "🇪🇸 Español"
+
+msgid "Adjective"
+msgstr "Adjetivo"
+
+msgid "Adposition"
+msgstr "Adposición"
+
+msgid "Adverb"
+msgstr "Adverbio"
+
+msgid "Auxiliary"
+msgstr "Auxiliar"
+
+msgid "Coordinating Conjunction"
+msgstr "Conjunción Coordinante"
+
+msgid "Determiner"
+msgstr "Determinante"
+
+msgid "Interjection"
+msgstr "Interjección"
+
+msgid "Noun"
+msgstr "Sustantivo"
+
+msgid "Numeral"
+msgstr "Numeral"
+
+msgid "Particle"
+msgstr "Partícula"
+
+msgid "Pronoun"
+msgstr "Pronombre"
+
+msgid "Proper Noun"
+msgstr "Nombre Propio"
+
+msgid "Punctuation"
+msgstr "Puntuación"
+
+msgid "Subordinating Conjunction"
+msgstr "Conjunción Subordinante"
+
+msgid "Symbol"
+msgstr "Símbolo"
+
+msgid "Verb"
+msgstr "Verbo"
+
+msgid "Other"
+msgstr "Otro"
+
+msgid "Part of Speech (POS)"
+msgstr "Parte de la Oración (POS)"
+
+msgid "Token Filters"
+msgstr "Filtros de Tokens"
