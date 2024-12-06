@@ -10,8 +10,8 @@ import altair as alt
 nlp = spacy.load("en_core_web_trf")
 
 # Define Streamlit layout
-st.set_page_config(layout="wide")
-st.title("Text Analysis App")
+st.set_page_config(layout="wide", page_title="Text Insighter")
+st.title("Text Insighter")
 st.sidebar.header("Settings")
 
 # Sidebar settings
