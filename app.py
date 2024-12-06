@@ -64,9 +64,29 @@ exclude_pos_filter = st.sidebar.multiselect(
     default=[]
 )
 
-# Exclude words input
-exclude_words = st.sidebar.text_input("Words to exclude (comma-separated):")
-exclude_words_set = set([word.strip().lower() for word in exclude_words.split(",") if word.strip()])
+# Exclude unigrams input
+exclude_unigrams = st.sidebar.text_input("Unigrams to exclude (comma-separated):")
+exclude_unigrams_set = set([word.strip().lower() for word in exclude_unigrams.split(",") if word.strip()])
+
+# Exclude bigrams input
+exclude_bigrams = st.sidebar.text_input("Bigrams to exclude (comma-separated):")
+exclude_bigrams_set = set([bigram.strip().lower() for bigram in exclude_bigrams.split(",") if bigram.strip()])
+
+# Unigram replacements
+st.sidebar.subheader("Unigram Replacements")
+unigram_replacements = st.sidebar.data_editor(
+    pd.DataFrame(columns=["Word", "Replacement"]),
+    num_rows="dynamic",
+    key="unigram_replacements"
+)
+
+# Bigram replacements
+st.sidebar.subheader("Bigram Replacements")
+bigram_replacements = st.sidebar.data_editor(
+    pd.DataFrame(columns=["Bigram", "Replacement"]),
+    num_rows="dynamic",
+    key="bigram_replacements"
+)
 
 # Token property checkboxes
 filter_stop_words = st.sidebar.checkbox("Exclude stop words", value=True)
@@ -100,17 +120,26 @@ if text_input.strip():
             (not exclude_pos_filter or token.pos_ not in exclude_pos_filter))
     ]
 
-    filtered_tokens = [
-        token for token in tokens
-        if token not in exclude_words_set
-    ]
+    # Apply unigram replacements
+    unigram_replacement_dict = dict(zip(unigram_replacements["Word"].str.lower(), unigram_replacements["Replacement"].str.lower()))
+    tokens = [unigram_replacement_dict.get(token, token) for token in tokens]
 
-    unigram_counts = Counter(filtered_tokens)
-    bigram_counts = Counter([" ".join(bigram) for bigram in zip(filtered_tokens, filtered_tokens[1:])])
+    unigram_counts = Counter(tokens)
+    bigram_counts = Counter([" ".join(bigram) for bigram in zip(tokens, tokens[1:])])
+
+    # Apply bigram replacements
+    bigram_replacement_dict = dict(zip(bigram_replacements["Bigram"].str.lower(), bigram_replacements["Replacement"].str.lower()))
+    bigram_counts = Counter({bigram_replacement_dict.get(bigram, bigram): count for bigram, count in bigram_counts.items()})
     
     # Merge unigram and bigram counts
     combined_counts = unigram_counts + bigram_counts
-    
+
+    # Apply unigram and bigram exclusion filters
+    filtered_combined_counts = {
+        k: v for k, v in combined_counts.items()
+        if k not in exclude_unigrams_set and k not in exclude_bigrams_set
+    }
+
     wordcloud = WordCloud(
         width=1600, 
         height=800, 
@@ -120,7 +149,7 @@ if text_input.strip():
         prefer_horizontal=0.9,  # Prefer horizontal words
         contour_width=1,  # Add contour for better visual quality
         contour_color="black"  # Contour color
-    ).generate_from_frequencies(combined_counts)
+    ).generate_from_frequencies(filtered_combined_counts)
 
     
 
