@@ -14,17 +14,17 @@ st.sidebar.header("Settings")
 
 # Sidebar settings
 spacy_models = {
-    "en_core_web_md": "🇺🇸 English",
-    "es_core_news_md": "🇪🇸 Spanish"
+    "en": {"model": "en_core_web_md", "label": "🇺🇸 English"},
+    "es": {"model": "es_core_news_md", "label": "🇪🇸 Spanish"}
 }
 model_option = st.sidebar.selectbox(
     "Select spaCy model:",
     options=list(spacy_models.keys()),
-    format_func=spacy_models.get
+    format_func=lambda lang: spacy_models[lang]["label"]
 )
 
 # Load the selected spaCy model
-nlp = spacy.load(model_option)
+nlp = spacy.load(spacy_models[model_option]["model"])
 
 top_n = st.sidebar.slider("Top N elements to display", min_value=1, max_value=30, value=15)
 
@@ -66,8 +66,13 @@ exclude_pos_filter = st.sidebar.multiselect(
 )
 
 # Load default values from JSON file
-with open("defaults.json", "r") as f:
-    defaults = json.load(f)
+defaults_file = f"defaults.{model_option}.json"
+try:
+    with open(defaults_file, "r") as f:
+        defaults = json.load(f)
+except FileNotFoundError:
+    st.error(f"Defaults file for {spacy_models[model_option]['label']} not found. Using empty defaults.")
+    defaults = {}
 
 # Exclude unigrams input
 with st.sidebar.expander("Exclude Unigrams"):
