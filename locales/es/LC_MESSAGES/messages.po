@@ -130,7 +130,7 @@ msgid "Pronoun"
 msgstr "Pronombre"
 
 msgid "Proper Noun"
-msgstr "Nombre Propio"
+msgstr "Sustantivo Propio"
 
 msgid "Punctuation"
 msgstr "Puntuación"
