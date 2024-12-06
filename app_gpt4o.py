@@ -42,7 +42,7 @@ pos_options = {
 pos_filter = st.sidebar.multiselect(
     "Include POS (Part of Speech):",
     options=list(pos_options.keys()),
-    format_func=lambda x: f"{x}: {pos_options[x]}",
+    format_func=pos_options.get,
     default=[]
 )
 
@@ -50,21 +50,21 @@ pos_filter = st.sidebar.multiselect(
 exclude_pos_filter = st.sidebar.multiselect(
     "Exclude POS (Part of Speech):",
     options=list(pos_options.keys()),
-    format_func=lambda x: f"{x}: {pos_options[x]}",
+    format_func=pos_options.get,
     default=[]
 )
-
-# Token property checkboxes
-filter_stop_words = st.sidebar.checkbox("Exclude stop words", value=True)
-filter_punct = st.sidebar.checkbox("Exclude punctuation", value=True)
-filter_alpha = st.sidebar.checkbox("Include only alphabetic tokens", value=True)
-filter_digits = st.sidebar.checkbox("Exclude digits", value=False)
-filter_currency = st.sidebar.checkbox("Exclude currency symbols", value=False)
-filter_quotes = st.sidebar.checkbox("Exclude quotes", value=False)
 
 # Exclude words input
 exclude_words = st.sidebar.text_input("Words to exclude (comma-separated):")
 exclude_words_set = set([word.strip().lower() for word in exclude_words.split(",") if word.strip()])
+
+# Token property checkboxes
+filter_stop_words = st.sidebar.checkbox("Exclude stop words", value=True)
+filter_punct = st.sidebar.checkbox("Exclude punctuation", value=True)
+filter_digits = st.sidebar.checkbox("Exclude digits", value=True)
+filter_currency = st.sidebar.checkbox("Exclude currency symbols", value=True)
+filter_quotes = st.sidebar.checkbox("Exclude quotes", value=True)
+lemmatize = st.sidebar.checkbox("Lemmatize", value=False)
 
 # Responsive layout
 col1, col2 = st.columns([2, 1])  # Left (text input + WordCloud) and right (bar charts)
@@ -79,10 +79,10 @@ if text_input.strip():
 
     # Token filters
     tokens = [
-        token.text.lower() for token in doc
-        if ((not filter_stop_words or not token.is_stop) and
+        (token.lemma_ if lemmatize else token.text).lower() for token in doc
+        if (token.is_alpha and
+            (not filter_stop_words or not token.is_stop) and
             (not filter_punct or not token.is_punct) and
-            (not filter_alpha or token.is_alpha) and
             (not filter_digits or not token.is_digit) and
             (not filter_currency or not token.is_currency) and
             (not filter_quotes or not token.is_quote) and
@@ -95,17 +95,29 @@ if text_input.strip():
         if token not in exclude_words_set
     ]
 
-    # Generate WordCloud
-    wordcloud = WordCloud(width=800, height=400, background_color="white").generate(" ".join(filtered_tokens))
-    
-    # Frequency counts for unigrams and bigrams
     unigram_counts = Counter(filtered_tokens)
     bigram_counts = Counter([" ".join(bigram) for bigram in zip(filtered_tokens, filtered_tokens[1:])])
+    
+    # Merge unigram and bigram counts
+    combined_counts = unigram_counts + bigram_counts
+    
+    wordcloud = WordCloud(
+        width=1600, 
+        height=800, 
+        background_color="white",
+        colormap="viridis",  # Improved color palette
+        max_words=200,  # Adjust maximum words
+        prefer_horizontal=0.9,  # Prefer horizontal words
+        contour_width=1,  # Add contour for better visual quality
+        contour_color="black"  # Contour color
+    ).generate_from_frequencies(combined_counts)
+
+    
 
     # WordCloud below the text input
     with col1:
         st.subheader("Word Cloud")
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(12, 6))
         ax.imshow(wordcloud, interpolation="bilinear")
         ax.axis("off")
         st.pyplot(fig)
@@ -132,7 +144,7 @@ if text_input.strip():
         unigram_df = pd.DataFrame(top_unigrams, columns=["Unigram", "Frequency"])
         unigram_chart = create_bar_chart(
             unigram_df, x_label="Unigram", y_label="Frequency", title="Top Unigrams"
-        )
+        ).configure_axisX(labelAngle=-45, labelOverlap=False)
         st.altair_chart(unigram_chart, use_container_width=True)
 
         st.subheader("Bigram Frequency Plot")
@@ -140,5 +152,5 @@ if text_input.strip():
         bigram_df = pd.DataFrame(top_bigrams, columns=["Bigram", "Frequency"])
         bigram_chart = create_bar_chart(
             bigram_df, x_label="Bigram", y_label="Frequency", title="Top Bigrams"
-        )
+        ).configure_axisX(labelAngle=-45, labelOverlap=False)
         st.altair_chart(bigram_chart, use_container_width=True)
