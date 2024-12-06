@@ -7,7 +7,7 @@ import pandas as pd
 import altair as alt
 
 # Load the spaCy model
-nlp = spacy.load("en_core_web_trf")
+nlp = spacy.load("en_core_web_md")
 
 # Define Streamlit layout
 st.set_page_config(layout="wide", page_title="Text Insighter")

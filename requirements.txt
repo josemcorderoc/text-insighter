@@ -1,5 +1,5 @@
 spacy
-https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0.tar.gz#egg=en_core_web_trf
+https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0.tar.gz#egg=en_core_web_md
 pandas
 altair
 wordcloud
