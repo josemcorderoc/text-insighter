@@ -4,3 +4,4 @@ altair
 wordcloud
 streamlit
 matplotlib
+spacy-transformers
