@@ -96,6 +96,12 @@ msgstr "🇺🇸 Inglés"
 msgid "🇪🇸 Spanish"
 msgstr "🇪🇸 Español"
 
+msgid "English"
+msgstr "Inglés"
+
+msgid "Spanish"
+msgstr "Español"
+
 msgid "Adjective"
 msgstr "Adjetivo"
 

@@ -17,13 +17,13 @@ st.set_page_config(
 
 # Set up localization
 langs = {
-    "en": "🇺🇸",
-    "es": "🇪🇸"
+    "en": "EN",
+    "es": "ES"
 }
 
 spacy_models = {
-    "en": {"model": "en_core_web_md", "label": "🇺🇸 English"},
-    "es": {"model": "es_core_news_md", "label": "🇪🇸 Spanish"}
+    "en": {"model": "en_core_web_md", "label": "English"},
+    "es": {"model": "es_core_news_md", "label": "Spanish"}
 }
 
 pos_options = {
