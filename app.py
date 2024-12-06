@@ -136,23 +136,31 @@ if text_input.strip():
     ]
 
     # Apply unigram replacements
-    unigram_replacement_dict = dict(zip(unigram_replacements["Word"].str.lower(), unigram_replacements["Replacement"].str.lower()))
+    unigram_replacement_dict = dict(zip(
+        unigram_replacements["Word"].str.lower().apply(lambda x: nlp(x)[0].lemma_ if lemmatize else x),
+        unigram_replacements["Replacement"].str.lower()
+    ))
     tokens = [unigram_replacement_dict.get(token, token) for token in tokens]
 
     unigram_counts = Counter(tokens)
     bigram_counts = Counter([" ".join(bigram) for bigram in zip(tokens, tokens[1:])])
 
     # Apply bigram replacements
-    bigram_replacement_dict = dict(zip(bigram_replacements["Bigram"].str.lower(), bigram_replacements["Replacement"].str.lower()))
+    bigram_replacement_dict = dict(zip(
+        bigram_replacements["Bigram"].str.lower().apply(lambda x: " ".join([token.lemma_ if lemmatize else token.text for token in nlp(x)])),
+        bigram_replacements["Replacement"].str.lower()
+    ))
     bigram_counts = Counter({bigram_replacement_dict.get(bigram, bigram): count for bigram, count in bigram_counts.items()})
     
     # Apply unigram exclusion filter
+    exclude_unigrams_set = set(exclude_unigrams["Unigram"].str.lower().apply(lambda x: nlp(x)[0].lemma_ if lemmatize else x))
     filtered_unigram_counts = Counter({
         k: v for k, v in unigram_counts.items()
         if k not in exclude_unigrams_set
     })
 
     # Apply bigram exclusion filter
+    exclude_bigrams_set = set(exclude_bigrams["Bigram"].str.lower().apply(lambda x: " ".join([token.lemma_ if lemmatize else token.text for token in nlp(x)])))
     filtered_bigram_counts = Counter({
         k: v for k, v in bigram_counts.items()
         if k not in exclude_bigrams_set
