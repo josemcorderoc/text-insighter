@@ -27,11 +27,26 @@ msgstr "Excluir Unigramas"
 msgid "Exclude Bigrams"
 msgstr "Excluir Bigramas"
 
+msgid "Exclude Trigrams"
+msgstr "Excluir Trigramas"
+
 msgid "Unigram Replacements"
 msgstr "Reemplazos de Unigramas"
 
 msgid "Bigram Replacements"
 msgstr "Reemplazos de Bigramas"
+
+msgid "Trigram Replacements"
+msgstr "Reemplazos de Trigramas"
+
+msgid "Include Unigrams in WordCloud"
+msgstr "Incluir Unigramas en Nube de Palabras"
+
+msgid "Include Bigrams in WordCloud"
+msgstr "Incluir Bigramas en Nube de Palabras"
+
+msgid "Include Trigrams in WordCloud"
+msgstr "Incluir Trigramas en Nube de Palabras"
 
 msgid "Exclude stop words"
 msgstr "Excluir stop words"
@@ -65,6 +80,9 @@ msgstr "Gráfico de Frecuencia de Unigramas"
 
 msgid "Bigram Frequency Plot"
 msgstr "Gráfico de Frecuencia de Bigramas"
+
+msgid "Trigram Frequency Plot"
+msgstr "Gráfico de Frecuencia de Trigramas"
 
 msgid "Top Unigrams"
 msgstr "Principales Unigramas"
