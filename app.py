@@ -144,6 +144,14 @@ with st.sidebar.expander(_("Bigram Replacements")):
         key="bigram_replacements"
     )
 
+# Trigram replacements
+with st.sidebar.expander(_("Trigram Replacements")):
+    trigram_replacements = st.data_editor(
+        pd.DataFrame(list(defaults.get("replace_trigrams", {}).items()), columns=["Trigram", "Replacement"]),
+        num_rows="dynamic",
+        key="trigram_replacements"
+    )
+
 # Token property checkboxes in a collapsible section
 with st.sidebar.expander(_("Token Filters")):
     filter_stop_words = st.checkbox(_("Exclude stop words"), value=True)
@@ -152,6 +160,12 @@ with st.sidebar.expander(_("Token Filters")):
     filter_currency = st.checkbox(_("Exclude currency symbols"), value=True)
     filter_quotes = st.checkbox(_("Exclude quotes"), value=True)
     lemmatize = st.checkbox(_("Lemmatize"), value=False)
+
+# WordCloud inclusion checkboxes
+with st.sidebar.expander(_("WordCloud Filters")):
+    include_unigrams_wc = st.checkbox(_("Include Unigrams in WordCloud"), value=True)
+    include_bigrams_wc = st.checkbox(_("Include Bigrams in WordCloud"), value=True)
+    include_trigrams_wc = st.checkbox(_("Include Trigrams in WordCloud"), value=True)
 
 # Responsive layout
 col1, col2 = st.columns([2, 1])  # Left (text input + WordCloud) and right (bar charts)
@@ -195,6 +209,13 @@ if text_input.strip():
     ))
     bigram_counts = Counter({bigram_replacement_dict.get(bigram, bigram): count for bigram, count in bigram_counts.items()})
     
+    # Apply trigram replacements
+    trigram_replacement_dict = dict(zip(
+        trigram_replacements["Trigram"].str.lower().apply(lambda x: " ".join([token.lemma_ if lemmatize else token.text for token in nlp(x)])),
+        trigram_replacements["Replacement"].str.lower()
+    ))
+    trigram_counts = Counter({trigram_replacement_dict.get(trigram, trigram): count for trigram, count in trigram_counts.items()})
+
     # Apply unigram exclusion filter
     exclude_unigrams_set = set(exclude_unigrams["Unigram"].str.lower().apply(lambda x: nlp(x)[0].lemma_ if lemmatize else x))
     filtered_unigram_counts = Counter({
@@ -217,7 +238,13 @@ if text_input.strip():
     })
 
     # Merge unigram, bigram, and trigram counts
-    combined_counts = filtered_unigram_counts + filtered_bigram_counts + filtered_trigram_counts
+    combined_counts = Counter()
+    if include_unigrams_wc:
+        combined_counts += filtered_unigram_counts
+    if include_bigrams_wc:
+        combined_counts += filtered_bigram_counts
+    if include_trigrams_wc:
+        combined_counts += filtered_trigram_counts
 
     wordcloud = WordCloud(
         width=1600, 
