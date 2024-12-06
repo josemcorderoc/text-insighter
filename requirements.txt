@@ -1,0 +1,6 @@
+spacy
+pandas
+altair
+wordcloud
+streamlit
+matplotlib
