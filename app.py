@@ -5,6 +5,7 @@ import spacy
 from collections import Counter
 import pandas as pd
 import altair as alt
+import json
 
 # Define Streamlit layout
 st.set_page_config(layout="wide", page_title="Text Insighter")
@@ -64,10 +65,14 @@ exclude_pos_filter = st.sidebar.multiselect(
     default=[]
 )
 
+# Load default values from JSON file
+with open("defaults.json", "r") as f:
+    defaults = json.load(f)
+
 # Exclude unigrams input
 with st.sidebar.expander("Exclude Unigrams"):
     exclude_unigrams = st.data_editor(
-        pd.DataFrame(columns=["Unigram"]),
+        pd.DataFrame(defaults.get("exclude_unigrams", []), columns=["Unigram"]),
         num_rows="dynamic",
         key="exclude_unigrams"
     )
@@ -76,7 +81,7 @@ exclude_unigrams_set = set(exclude_unigrams["Unigram"].str.lower())
 # Exclude bigrams input
 with st.sidebar.expander("Exclude Bigrams"):
     exclude_bigrams = st.data_editor(
-        pd.DataFrame(columns=["Bigram"]),
+        pd.DataFrame(defaults.get("exclude_bigrams", []), columns=["Bigram"]),
         num_rows="dynamic",
         key="exclude_bigrams"
     )
@@ -93,7 +98,7 @@ with st.sidebar.expander("Unigram Replacements"):
 # Bigram replacements
 with st.sidebar.expander("Bigram Replacements"):
     bigram_replacements = st.data_editor(
-        pd.DataFrame(columns=["Bigram", "Replacement"]),
+        pd.DataFrame(list(defaults.get("replace_bigrams", {}).items()), columns=["Bigram", "Replacement"]),
         num_rows="dynamic",
         key="bigram_replacements"
     )
@@ -141,14 +146,20 @@ if text_input.strip():
     bigram_replacement_dict = dict(zip(bigram_replacements["Bigram"].str.lower(), bigram_replacements["Replacement"].str.lower()))
     bigram_counts = Counter({bigram_replacement_dict.get(bigram, bigram): count for bigram, count in bigram_counts.items()})
     
-    # Merge unigram and bigram counts
-    combined_counts = unigram_counts + bigram_counts
+    # Apply unigram exclusion filter
+    filtered_unigram_counts = Counter({
+        k: v for k, v in unigram_counts.items()
+        if k not in exclude_unigrams_set
+    })
 
-    # Apply unigram and bigram exclusion filters
-    filtered_combined_counts = {
-        k: v for k, v in combined_counts.items()
-        if k not in exclude_unigrams_set and k not in exclude_bigrams_set
-    }
+    # Apply bigram exclusion filter
+    filtered_bigram_counts = Counter({
+        k: v for k, v in bigram_counts.items()
+        if k not in exclude_bigrams_set
+    })
+
+    # Merge unigram and bigram counts
+    combined_counts = filtered_unigram_counts + filtered_bigram_counts
 
     wordcloud = WordCloud(
         width=1600, 
@@ -159,7 +170,7 @@ if text_input.strip():
         prefer_horizontal=0.9,  # Prefer horizontal words
         contour_width=1,  # Add contour for better visual quality
         contour_color="black"  # Contour color
-    ).generate_from_frequencies(filtered_combined_counts)
+    ).generate_from_frequencies(combined_counts)
 
     
 
@@ -189,7 +200,7 @@ if text_input.strip():
     # Both bar charts on the right
     with col2:
         st.subheader("Unigram Frequency Plot")
-        top_unigrams = unigram_counts.most_common(top_n)
+        top_unigrams = filtered_unigram_counts.most_common(top_n)
         unigram_df = pd.DataFrame(top_unigrams, columns=["Unigram", "Frequency"])
         unigram_chart = create_bar_chart(
             unigram_df, x_label="Unigram", y_label="Frequency", title="Top Unigrams"
@@ -197,7 +208,7 @@ if text_input.strip():
         st.altair_chart(unigram_chart, use_container_width=True)
 
         st.subheader("Bigram Frequency Plot")
-        top_bigrams = bigram_counts.most_common(top_n)
+        top_bigrams = filtered_bigram_counts.most_common(top_n)
         bigram_df = pd.DataFrame(top_bigrams, columns=["Bigram", "Frequency"])
         bigram_chart = create_bar_chart(
             bigram_df, x_label="Bigram", y_label="Frequency", title="Top Bigrams"
