@@ -65,28 +65,38 @@ exclude_pos_filter = st.sidebar.multiselect(
 )
 
 # Exclude unigrams input
-exclude_unigrams = st.sidebar.text_input("Unigrams to exclude (comma-separated):")
-exclude_unigrams_set = set([word.strip().lower() for word in exclude_unigrams.split(",") if word.strip()])
+with st.sidebar.expander("Exclude Unigrams"):
+    exclude_unigrams = st.data_editor(
+        pd.DataFrame(columns=["Unigram"]),
+        num_rows="dynamic",
+        key="exclude_unigrams"
+    )
+exclude_unigrams_set = set(exclude_unigrams["Unigram"].str.lower())
 
 # Exclude bigrams input
-exclude_bigrams = st.sidebar.text_input("Bigrams to exclude (comma-separated):")
-exclude_bigrams_set = set([bigram.strip().lower() for bigram in exclude_bigrams.split(",") if bigram.strip()])
+with st.sidebar.expander("Exclude Bigrams"):
+    exclude_bigrams = st.data_editor(
+        pd.DataFrame(columns=["Bigram"]),
+        num_rows="dynamic",
+        key="exclude_bigrams"
+    )
+exclude_bigrams_set = set(exclude_bigrams["Bigram"].str.lower())
 
 # Unigram replacements
-st.sidebar.subheader("Unigram Replacements")
-unigram_replacements = st.sidebar.data_editor(
-    pd.DataFrame(columns=["Word", "Replacement"]),
-    num_rows="dynamic",
-    key="unigram_replacements"
-)
+with st.sidebar.expander("Unigram Replacements"):
+    unigram_replacements = st.data_editor(
+        pd.DataFrame(columns=["Word", "Replacement"]),
+        num_rows="dynamic",
+        key="unigram_replacements"
+    )
 
 # Bigram replacements
-st.sidebar.subheader("Bigram Replacements")
-bigram_replacements = st.sidebar.data_editor(
-    pd.DataFrame(columns=["Bigram", "Replacement"]),
-    num_rows="dynamic",
-    key="bigram_replacements"
-)
+with st.sidebar.expander("Bigram Replacements"):
+    bigram_replacements = st.data_editor(
+        pd.DataFrame(columns=["Bigram", "Replacement"]),
+        num_rows="dynamic",
+        key="bigram_replacements"
+    )
 
 # Token property checkboxes
 filter_stop_words = st.sidebar.checkbox("Exclude stop words", value=True)
