@@ -119,6 +119,15 @@ with st.sidebar.expander(_("Exclude Bigrams")):
     )
 exclude_bigrams_set = set(exclude_bigrams["Bigram"].str.lower())
 
+# Exclude trigrams input
+with st.sidebar.expander(_("Exclude Trigrams")):
+    exclude_trigrams = st.data_editor(
+        pd.DataFrame(defaults.get("exclude_trigrams", []), columns=["Trigram"]),
+        num_rows="dynamic",
+        key="exclude_trigrams"
+    )
+exclude_trigrams_set = set(exclude_trigrams["Trigram"].str.lower())
+
 # Unigram replacements
 with st.sidebar.expander(_("Unigram Replacements")):
     unigram_replacements = st.data_editor(
@@ -177,6 +186,7 @@ if text_input.strip():
 
     unigram_counts = Counter(tokens)
     bigram_counts = Counter([" ".join(bigram) for bigram in zip(tokens, tokens[1:])])
+    trigram_counts = Counter([" ".join(trigram) for trigram in zip(tokens, tokens[1:], tokens[2:])])
 
     # Apply bigram replacements
     bigram_replacement_dict = dict(zip(
@@ -199,8 +209,15 @@ if text_input.strip():
         if k not in exclude_bigrams_set
     })
 
-    # Merge unigram and bigram counts
-    combined_counts = filtered_unigram_counts + filtered_bigram_counts
+    # Apply trigram exclusion filter
+    exclude_trigrams_set = set(exclude_trigrams["Trigram"].str.lower().apply(lambda x: " ".join([token.lemma_ if lemmatize else token.text for token in nlp(x)])))
+    filtered_trigram_counts = Counter({
+        k: v for k, v in trigram_counts.items()
+        if k not in exclude_trigrams_set
+    })
+
+    # Merge unigram, bigram, and trigram counts
+    combined_counts = filtered_unigram_counts + filtered_bigram_counts + filtered_trigram_counts
 
     wordcloud = WordCloud(
         width=1600, 
@@ -253,3 +270,11 @@ if text_input.strip():
             bigram_df, x_label="Bigram", y_label="Frequency", title=_("Top Bigrams")
         ).configure_axisX(labelAngle=-45, labelOverlap=False)
         st.altair_chart(bigram_chart, use_container_width=True)
+
+        st.subheader(_("Trigram Frequency Plot"))
+        top_trigrams = filtered_trigram_counts.most_common(top_n)
+        trigram_df = pd.DataFrame(top_trigrams, columns=["Trigram", "Frequency"])
+        trigram_chart = create_bar_chart(
+            trigram_df, x_label="Trigram", y_label="Frequency", title=_("Top Trigrams")
+        ).configure_axisX(labelAngle=-45, labelOverlap=False)
+        st.altair_chart(trigram_chart, use_container_width=True)
