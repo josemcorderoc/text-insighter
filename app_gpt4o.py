@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import spacy
 from collections import Counter
 import pandas as pd
+import altair as alt
 
 # Load the spaCy model
 nlp = spacy.load("en_core_web_trf")
@@ -14,7 +15,7 @@ st.title("Text Analysis App")
 st.sidebar.header("Settings")
 
 # Sidebar settings
-top_n = st.sidebar.slider("Top N elements to display", min_value=1, max_value=50, value=10)
+top_n = st.sidebar.slider("Top N elements to display", min_value=1, max_value=30, value=15)
 
 # Full POS list with descriptions
 pos_options = {
@@ -109,14 +110,35 @@ if text_input.strip():
         ax.axis("off")
         st.pyplot(fig)
 
+    # Create bar charts using Altair
+    def create_bar_chart(data, x_label, y_label, title):
+        chart = (
+            alt.Chart(data)
+            .mark_bar()
+            .encode(
+                x=alt.X(x_label, sort="-y", title=x_label.capitalize()),
+                y=alt.Y(y_label, title="Frequency"),
+                tooltip=[x_label, y_label]
+            )
+            .properties(title=title)
+            .configure_title(fontSize=16)
+        )
+        return chart
+
     # Both bar charts on the right
     with col2:
         st.subheader("Unigram Frequency Plot")
         top_unigrams = unigram_counts.most_common(top_n)
         unigram_df = pd.DataFrame(top_unigrams, columns=["Unigram", "Frequency"])
-        st.bar_chart(unigram_df.set_index("Unigram"))
+        unigram_chart = create_bar_chart(
+            unigram_df, x_label="Unigram", y_label="Frequency", title="Top Unigrams"
+        )
+        st.altair_chart(unigram_chart, use_container_width=True)
 
         st.subheader("Bigram Frequency Plot")
         top_bigrams = bigram_counts.most_common(top_n)
         bigram_df = pd.DataFrame(top_bigrams, columns=["Bigram", "Frequency"])
-        st.bar_chart(bigram_df.set_index("Bigram"))
+        bigram_chart = create_bar_chart(
+            bigram_df, x_label="Bigram", y_label="Frequency", title="Top Bigrams"
+        )
+        st.altair_chart(bigram_chart, use_container_width=True)
