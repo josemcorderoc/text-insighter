@@ -55,10 +55,7 @@ lang = st.sidebar.radio(
 locale_dir = "/Users/jm/Code/text-insighter/locales"
 gettext.bindtextdomain('messages', locale_dir)
 gettext.textdomain('messages')
-try:
-    _ = gettext.translation('messages', locale_dir, languages=[lang]).gettext
-except FileNotFoundError:
-    _ = lambda s: s  # Fallback to identity function if translation file is not found
+_ = gettext.translation('messages', locale_dir, languages=[lang]).gettext
 
 st.title("Text Insighter")
 st.sidebar.header(_("Settings"))
