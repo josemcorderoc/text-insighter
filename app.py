@@ -52,7 +52,7 @@ lang = st.sidebar.radio(
     format_func=langs.get,
     horizontal=True
 )
-locale_dir = "/Users/jm/Code/text-insighter/locales"
+locale_dir = "locales"
 gettext.bindtextdomain('messages', locale_dir)
 gettext.textdomain('messages')
 _ = gettext.translation('messages', locale_dir, languages=[lang]).gettext
