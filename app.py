@@ -11,7 +11,7 @@ import gettext
 # Define Streamlit layout
 st.set_page_config(
     layout="wide", 
-    page_title="FAO Text Insighter", 
+    page_title="Text Insighter", 
     page_icon="assets/favicon.ico"
 )
 
@@ -57,7 +57,7 @@ gettext.bindtextdomain('messages', locale_dir)
 gettext.textdomain('messages')
 _ = gettext.translation('messages', locale_dir, languages=[lang]).gettext
 
-st.title("FAO Text Insighter")
+st.title("Text Insighter")
 st.sidebar.header(_("Settings"))
 
 # Sidebar settings
